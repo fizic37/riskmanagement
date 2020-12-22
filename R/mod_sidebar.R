@@ -29,13 +29,21 @@ mod_sidebar_server <- function(input, output, session,vals){
                                           shinydashboard::menuSubItem(text = "Portofoliu",tabName = "database-portofoliu",selected = FALSE),
                                           shinydashboard::menuSubItem(text = "CRC",tabName = "database_CRC",selected = FALSE)
                                           ,shinydashboard::menuSubItem(text = "CIP",tabName = "database_CIP",selected = FALSE),
-                                          shinydashboard::menuSubItem(text = "Plati",tabName = "database_plati",selected = TRUE),
+                                          shinydashboard::menuSubItem(text = "Plati",tabName = "database_plati",selected = FALSE),
                                           shinydashboard::menuSubItem(text = "Grupuri",tabName = "grupuri",icon = icon("users"),selected = FALSE)),
-                          shinydashboard::menuItem(tabName = "expunere_agregata", text = "Expunerea Agregata",icon = icon("pound-sign"),
-                                                   selected = FALSE),
+                          #shinydashboard::menuItem(tabName = "expunere_agregata", text = "Expunerea Agregata",icon = icon("pound-sign"),
+                             #                      selected = FALSE),
                           #,shinydashboard::menuItem(tabName = "garantii_colaterale", text = "Garantii Colaterale",icon = icon("landmark"),selected = FALSE)
-                          shinydashboard::menuItem(tabName = "raportare_bnr", text = "Raportare BNR Prima Casa",icon = icon("landmark"),
-                                                   selected = FALSE)  )
+                          shinydashboard::menuItem(tabName = "bnr_reporting", text = "Raportare BNR",icon = icon("landmark"),
+                                                   selected = FALSE,
+                                          shinydashboard::menuSubItem(tabName = "expunere_agregata", text = "Expunerea Agregata",
+                                                                    icon = icon("pound-sign"), selected = FALSE),
+                                          shinydashboard::menuSubItem(tabName = "raportare_bnr", text = "Raportare Prima Casa",
+                                                                      icon = icon("laptop-house"), selected = FALSE)),
+                          shinydashboard::menuItem(tabName = "ifrs9", text = "IFRS9",icon = icon("info"),
+                                                   selected = TRUE,
+                              shinydashboard::menuSubItem(tabName = "ifrs_portofoliu",text = "Portofoliu IFRS9",selected = TRUE, icon = icon("wallet")),
+                              shinydashboard::menuSubItem(tabName = "ifrs_plati",text = "Plati IFRS9",selected = FALSE, icon = icon("yen-sign"))))
   
   guest_user_sidebar <- shinydashboard::sidebarMenu(id = ns("tabs"),
                           shinydashboard::menuItem(tabName = "home",text = "Home"),

@@ -35,7 +35,8 @@ app_ui <- function(request) {
                         shinydashboard::tabItem(tabName = "grupuri", mod_database_grupuri_ui("database_grupuri_ui_1")),
                         shinydashboard::tabItem(tabName = "expunere_agregata", mod_expunere_agregata_ui("expunere_agregata_ui_1")),
                         shinydashboard::tabItem(tabName = "garantii_colaterale", mod_garantii_colaterale_ui("garantii_colaterale_ui_1")),
-                        shinydashboard::tabItem(tabName = "raportare_bnr",mod_raportare_bnr_ui("raportare_bnr_ui_1"))
+                        shinydashboard::tabItem(tabName = "raportare_bnr",mod_raportare_bnr_ui("raportare_bnr_ui_1")),
+                        shinydashboard::tabItem(tabName = "ifrs_portofoliu", mod_ifrs_portofoliu_ui("ifrs_portofoliu_ui_1"))
                               )))
     
     
