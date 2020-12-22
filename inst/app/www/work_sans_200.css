@@ -1,0 +1,12 @@
+@font-face {
+  font-family: 'Work Sans';
+  font-style: normal;
+  font-weight: 200;
+  src: url('../fonts/work-sans-v8-latin-200.eot'); /* IE9 Compat Modes */
+  src: local(''), local(''),
+       url('../fonts/work-sans-v8-latin-200.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/work-sans-v8-latin-200.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/work-sans-v8-latin-200.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/work-sans-v8-latin-200.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/work-sans-v8-latin-200.svg#\1') format('svg'); /* Legacy iOS */
+}
