@@ -74,6 +74,10 @@ app_server <- function( input, output, session ) {
    if (sum("raportare_bnr" == vals$sidebar_selected)==1) {
      callModule(mod_raportare_bnr_server, "raportare_bnr_ui_1")
      vals$sidebar_selected <- c(vals$sidebar_selected,"raportare_bnr")  }
+   
+   if (sum("ifrs_portofoliu" == vals$sidebar_selected)==1) {
+     callModule(mod_ifrs_portofoliu_server, "ifrs_portofoliu_ui_1")
+     vals$sidebar_selected <- c(vals$sidebar_selected,"ifrs_portofoliu")  }
  })
   
 }

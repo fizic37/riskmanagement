@@ -59,6 +59,7 @@ usethis::use_data(view_baza_date_crc,internal = FALSE,overwrite = TRUE,compress 
 usethis::use_data(baza_date_crc_sliced,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
 usethis::use_data(coresp_banci,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
 usethis::use_data(coresp_banci_bi,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
+usethis::use_data(modelling_results,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
 
 ## Add modules ----
 ## Create a module infrastructure in R/
@@ -80,6 +81,7 @@ golem::add_module( name = "garantii_colaterale")
 golem::add_module( name = "read_excel_colaterale")
 golem::add_module( name = "raportare_bnr")
 golem::add_module( name = "compare_df")
+golem::add_module( name = "ifrs_portofoliu")
 
 
 
