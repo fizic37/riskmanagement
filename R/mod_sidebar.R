@@ -28,7 +28,7 @@ mod_sidebar_server <- function(input, output, session,vals){
                                                                             tabName = "database1",selected = FALSE,
                                           shinydashboard::menuSubItem(text = "Portofoliu",tabName = "database-portofoliu",selected = FALSE),
                                           shinydashboard::menuSubItem(text = "CRC",tabName = "database_CRC",selected = FALSE)
-                                          ,shinydashboard::menuSubItem(text = "CIP",tabName = "database_CIP",selected = FALSE),
+                                          ,shinydashboard::menuSubItem(text = "CIP",tabName = "database_CIP",selected = TRUE),
                                           shinydashboard::menuSubItem(text = "Plati",tabName = "database_plati",selected = FALSE),
                                           shinydashboard::menuSubItem(text = "Grupuri",tabName = "grupuri",icon = icon("users"),selected = FALSE)),
                           #shinydashboard::menuItem(tabName = "expunere_agregata", text = "Expunerea Agregata",icon = icon("pound-sign"),
@@ -42,7 +42,7 @@ mod_sidebar_server <- function(input, output, session,vals){
                                                                       icon = icon("laptop-house"), selected = FALSE)),
                           shinydashboard::menuItem(tabName = "ifrs9", text = "IFRS9",icon = icon("info"),
                                                    selected = TRUE,
-                              shinydashboard::menuSubItem(tabName = "ifrs_portofoliu",text = "Portofoliu IFRS9",selected = TRUE, icon = icon("wallet")),
+                              shinydashboard::menuSubItem(tabName = "ifrs_portofoliu",text = "Portofoliu IFRS9",selected = FALSE, icon = icon("wallet")),
                               shinydashboard::menuSubItem(tabName = "ifrs_plati",text = "Plati IFRS9",selected = FALSE, icon = icon("yen-sign"))))
   
   guest_user_sidebar <- shinydashboard::sidebarMenu(id = ns("tabs"),
