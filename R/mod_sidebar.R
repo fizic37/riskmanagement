@@ -26,9 +26,9 @@ mod_sidebar_server <- function(input, output, session,vals){
                             shinydashboard::menuItem(tabName = "solduri", text = "Portofoliu",icon = icon("book")),
                             shinydashboard::menuItem(text = "Database files stored",icon = icon("database"),
                                                                             tabName = "database1",selected = FALSE,
-                                          shinydashboard::menuSubItem(text = "Portofoliu",tabName = "database-portofoliu",selected = FALSE),
+                                          shinydashboard::menuSubItem(text = "Portofoliu",tabName = "database-portofoliu",selected = TRUE),
                                           shinydashboard::menuSubItem(text = "CRC",tabName = "database_CRC",selected = FALSE)
-                                          ,shinydashboard::menuSubItem(text = "CIP",tabName = "database_CIP",selected = TRUE),
+                                          ,shinydashboard::menuSubItem(text = "CIP",tabName = "database_CIP",selected = FALSE),
                                           shinydashboard::menuSubItem(text = "Plati",tabName = "database_plati",selected = FALSE),
                                           shinydashboard::menuSubItem(text = "Grupuri",tabName = "grupuri",icon = icon("users"),selected = FALSE)),
                           #shinydashboard::menuItem(tabName = "expunere_agregata", text = "Expunerea Agregata",icon = icon("pound-sign"),
