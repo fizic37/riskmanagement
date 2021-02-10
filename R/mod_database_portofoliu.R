@@ -10,8 +10,13 @@
 mod_database_portofoliu_ui <- function(id){
   ns <- NS(id)
   
-  shinydashboard::box( title = "Sinteza portfolio data. Click refresh to see updated data.",status = "success",width = 12,collapsible = TRUE,collapsed = TRUE,
-                       DT::dataTableOutput(ns("sinteza_portofoliu")) %>% shinycssloaders::withSpinner(color = "#77547a"),br(),br(),
+  shinydashboard::box( title = "Sinteza portfolio data. Click refresh to see updated data.",
+                        status = "success",width = 12,collapsible = TRUE,collapsed = F,
+                       
+                       DT::dataTableOutput(ns("sinteza_portofoliu")),
+                       tags$script(src = "portofoliu_buttons.js"),
+                       tags$script(paste0("portofoliu_module_js('", ns(''), "')")),
+                       
                        uiOutput(ns("database_portof_output")))
   
   
@@ -28,65 +33,108 @@ mod_database_portofoliu_server <- function(input, output, session,vals){
   
   threshold_date_input <- as.Date("2018-12-31")
   
-  portof_database <- readRDS(file = "R/reactivedata/portof_database.rds")
   
-  observe({vals$portofoliu_database <-  portof_database })
+  load("data/view1_portofoliu.rda")
   
- 
-  output$sinteza_portofoliu <- DT::renderDataTable({
-    dt_generate_function(df = portof_database %>% dplyr::group_by(anul_de_raportare) %>%
-      dplyr:: summarise(nr_contracte = dplyr::n(),garantii_sold = sum(expunere),contragarantii=sum(contragarantii),
-            provizion_contabil=sum(provizion_contabil)), round_col = 2:5) })
+  vals_portofoliu <- reactiveValues(view1_portofoliu = view1_portofoliu)
   
-  output$database_portof_output <- renderUI({
-    if (all(is.null(vals$input_save_portof),is.null(input$delete_portof_database))) {
-      fillRow(flex = c(1,NA),downloadButton(outputId = session$ns("down_portof_database"),label = "Download portfolio database"),
-              actionButton(inputId = session$ns("delete_portof_database"),label = "Delete observations",
-                                     icon = icon("minus-square"),width = "230px"))   }
-    else {
-      fluidRow(column(width = 4,downloadButton(outputId = session$ns("down_portof_database"),label = "Download portfolio database")),
-               column(width = 4,actionButton(inputId = session$ns("delete_portof_database"),label = "Delete observations",
-                                             icon = icon("minus-square"),width = "230px")),
-               column(width = 4,actionButton(inputId = session$ns("refresh_portof_database"),label = "Refresh Portofoliu",
-                                             icon = icon("redo"),width = "230px")))  
-    } 
-  })
   
-  observeEvent(input$delete_portof_database,{
-      
-      withProgress(expr = {
-      
-      portof_database <-   readRDS(file = "R/reactivedata/portof_database.rds")
-      dates_portof_database <-  portof_database %>% dplyr::pull(var = anul_de_raportare) %>% unique() %>% sort()
-      shinyWidgets::inputSweetAlert(session = session,input = "select",inputId = session$ns("date_delete_portof"),type = "warning",
-                  inputOptions = dates_portof_database[which(dates_portof_database>threshold_date_input)],
-                                    btn_colors = "#f3d512",btn_labels = "OK",
-                                    title = "Selecteaza data raportului pe care vrei sa-l stergi") 
-      
-  
-      observeEvent(input$date_delete_portof,{
-        saveRDS(file = "R/reactivedata/portof_database.rds",version = 3,compress = "gzip", object =  dplyr::filter(portof_database,
-              anul_de_raportare != as.Date.numeric(as.numeric(input$date_delete_portof),origin = "1970-01-01")))
-        
-      vals$portofoliu_database <-  dplyr::filter(portof_database,
-                  anul_de_raportare != as.Date.numeric(as.numeric(input$date_delete_portof),origin = "1970-01-01")) 
-      
-      })
-      },message = "Processing for deletion")
+  # Key observer. Everytime it updates I update actions and render teh main table.
+  # Note I do not save it, as it will be saved from the beginning. I only save it inside vals_cip$baza_date_cip observer
+  observeEvent(vals_portofoliu$view1_portofoliu,{
     
-    })
-  
- 
-  
-  observeEvent(input$refresh_portof_database,{
-    output$sinteza_portofoliu <- DT::renderDataTable({
-      dt_generate_function(df = readRDS('R/reactivedata/portof_database.rds') %>% dplyr::group_by(anul_de_raportare) %>%
-                             dplyr:: summarise(nr_contracte = dplyr::n(),garantii_sold = sum(expunere),contragarantii=sum(contragarantii),
-                                               provizion_contabil=sum(provizion_contabil)), round_col = 2:5) })
+    vals_portofoliu$unique_dates <-  vals_portofoliu$view1_portofoliu$anul_de_raportare
+    
+    vals_portofoliu$actions <- purrr::map_chr(vals_portofoliu$unique_dates, function(id_) {
+      paste0(
+        '<div class="btn-group" style="width: 75px;" role="group" aria-label="Basic example">
+          <button class="btn btn-sm download_btn" data-toggle="tooltip" data-placement="top" title="Download" id = ', id_, ' style="margin: 0"><i class="fa fa-download"></i></button>
+          <button class="btn btn-danger btn-sm delete_btn" data-toggle="tooltip" data-placement="top" title="Delete" id = ', id_, ' style="margin: 0"><i class="fa fa-trash-o"></i></button>
+        </div>'
+      )  })
+    output$sinteza_portofoliu <- DT::renderDataTable({ DT::datatable(rownames = F, escape = F,
+      data = cbind(tibble::tibble(" " = vals_portofoliu$actions),vals_portofoliu$view1_portofoliu),
+        options = list(dom = "tp",pageLength=5)) %>% 
+          DT::formatRound(columns = 3:6, digits = 0) })
+    
+    
   })
   
-  output$down_portof_database <- downloadHandler(filename = function() {"portof_database.csv"},
-      content = function(file) {readr::write_csv(x = readRDS('R/reactivedata/portof_database.rds'),path = file) })
+  # Key observer. Every time i update vals_portofoliu$portof_database, I save the new database, recalculate view1 and save view1
+  observeEvent(vals_portofoliu$portof_database,{
+    vals_portofoliu$view1_portofoliu <- vals_portofoliu$portof_database %>% dplyr::group_by(anul_de_raportare) %>%
+      dplyr:: summarise(nr_contracte = dplyr::n(),garantii_sold = sum(expunere),contragarantii=sum(contragarantii),
+                        provizion_contabil=sum(provizion_contabil)) %>% dplyr::arrange(desc(anul_de_raportare))
+    
+    portof_database <- isolate(vals_portofoliu$portof_database)
+    
+    usethis::use_data(portof_database,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
+    
+    view1_portofoliu <- isolate(vals_portofoliu$view1_portofoliu)
+    
+    usethis::use_data(view1_portofoliu,internal = FALSE,overwrite = TRUE,compress = "gzip",version = 3)
+    
+  })
+ 
+  observeEvent(input$data_raport_to_download,{
+    
+    showModal(modalDialog(title = h3("ATENTIE!",style = "color: #ffa500;"), size = "l",
+                          h3(paste0("Esti sigur ca vrei sa downloadez portofoliul la data de ",
+                                    input$data_raport_to_download, " ?"), style = "color: #77547a"),  footer = 
+                            tagList(shinyWidgets::downloadBttn(outputId = session$ns("confirm_download"),label = "Download",
+                                                               color = "success", size = "md"),
+                                    shinyWidgets::actionBttn(inputId = session$ns("cancel_download"),label = "Cancel",
+                                                             icon = icon("window-close"),color = "danger",size = "md")
+                            )))
+    
+    output$confirm_download <- downloadHandler(filename = function(){paste0("portof_database_",input$data_raport_to_download,".csv")},
+                                                content = function(file){
+                  load("data/portof_database.rda")
+          readr::write_csv(x = portof_database %>% dplyr::filter(anul_de_raportare == 
+                        as.Date.character(input$data_raport_to_download)), path = file) })
+    
+    removeModal(session = session)
+  })
+  
+  # Remove modal on cancel download button
+  observeEvent(input$cancel_download,{
+    removeModal(session = session)  })
+  
+  observeEvent(input$data_raport_to_delete,{
+    
+    showModal(modalDialog(title = h3("ATENTIE!",style = "color: #ffa500;"), size = "l",
+                          h3(paste0("Esti sigur ca vrei sa stergi portofoliul la data de ",
+                                    input$data_raport_to_delete, " ?"), style = "color: #77547a"),  footer = 
+                            tagList(shinyWidgets::actionBttn(inputId = session$ns("confirm_delete"),label = "Confirm",
+                                                             icon = icon("minus-square"),color = "success",size = "md"),
+                                    shinyWidgets::actionBttn(inputId = session$ns("cancel_delete"),label = "Cancel",
+                                                             icon = icon("window-close"),color = "danger",size = "md")
+                            )))
+  }) 
+  
+  # Remove modal on cancel delete button
+  observeEvent(input$cancel_delete,{
+    removeModal(session = session)  })
+  
+  
+  observeEvent(input$confirm_delete,{
+    
+    load("data/portof_database.rda")
+    vals_portofoliu$portof_database <- portof_database %>% dplyr::filter(anul_de_raportare != 
+                                              as.Date.character(input$data_raport_to_delete))
+    removeModal(session = session)
+    
+    
+  })
+  
+  
+  
+     
+    
+  
+  
+  
+ 
   
   
 }
